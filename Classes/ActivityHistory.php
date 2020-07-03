@@ -59,4 +59,17 @@ class ActivityHistory extends \Aurora\System\AbstractContainer
 			'GuestPublicId'	    => array('string', 'guest_public_id', true, false),
 		);
 	}
+
+	public function toResponseArray()
+	{
+		return [
+			'UserId' => $this->UserId,
+			'ResourceType' => $this->ResourceType,
+			'ResourceId' => $this->ResourceId,
+			'IpAddress' => $this->IpAddress,
+			'Action' => $this->Action,
+			'Timestamp' => $this->Timestamp,
+			'GuestPublicId' => $this->GuestPublicId,
+		];
+	}
 }

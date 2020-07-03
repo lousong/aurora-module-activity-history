@@ -39,7 +39,7 @@ class CommandCreator extends \Aurora\System\Db\AbstractCommandCreator
 			$Limit = sprintf("LIMIT %d", $Limit);
 			$Offset = sprintf("OFFSET %d", $Offset);
 		}
-		$sSql = 'SELECT * FROM %sactivity_history WHERE user_id = %d, resource_type = %d, resource_id = %d %s %s';
+		$sSql = 'SELECT * FROM %sactivity_history WHERE user_id = %d AND resource_type = %d AND resource_id = %d %s %s';
 
 		return sprintf($sSql, $this->prefix(), $UserId, $this->escapeString($ResourceType), $this->escapeString($ResourceId), $Limit, $Offset);
 	}
