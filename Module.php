@@ -50,7 +50,20 @@ class Module extends \Aurora\System\Module\AbstractModule
 
 	public function onAddToActivityHistory($aParams, &$mResult)
 	{
-		$this->Create($aParams['UserId'], $aParams['ResourceType'], $aParams['ResourceId'], $aParams['Action']);
+		$iUserId = 0;
+		if  (is_numeric($aParams['UserId']))
+		{
+			$iUserId = $aParams['UserId'];
+		}
+		else
+		{
+			$oUser = \Aurora\Modules\Core\Module::getInstance()->GetUserByPublicId($aParams['UserId']);
+			if ($oUser)
+			{
+				$iUserId = $oUser->EntityId;
+			}
+		}
+		$this->Create($iUserId, $aParams['ResourceType'], $aParams['ResourceId'], $aParams['Action']);
 	}
 
 	protected function CheckAccess(&$UserId)

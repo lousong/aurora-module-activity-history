@@ -1,4 +1,4 @@
-CREATE TABLE `%PREFIX%au_activity_history` (
+CREATE TABLE `%PREFIX%activity_history` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`user_id` BIGINT(20) NULL DEFAULT NULL,
 	`resource_type` VARCHAR(255) NULL DEFAULT NULL,
