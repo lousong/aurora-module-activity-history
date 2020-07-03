@@ -68,9 +68,9 @@ class CommandCreator extends \Aurora\System\Db\AbstractCommandCreator
 	 *
 	 * @return string
 	 */
-	public function delete($sHash)
+	public function delete($UserId, $ResourceType, $ResourceId)
 	{
-		$sSql = 'DELETE FROM %smin_hashes WHERE user_id = %d, resource_type = %d, resource_id = %d';
+		$sSql = 'DELETE FROM %smin_hashes WHERE user_id = %d, resource_type = %s, resource_id = %s';
 
 		return sprintf($sSql, $this->prefix(), $UserId, $this->escapeString($ResourceType), $this->escapeString($ResourceId));
 	}
