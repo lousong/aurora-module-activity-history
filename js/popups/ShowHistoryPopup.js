@@ -125,7 +125,6 @@ CShowHistoryPopup.prototype.clearHistory = function ()
 
 CShowHistoryPopup.prototype.onDeleteActivityHistory = function (oResponse, oRequest)
 {
-	console.log('oResponse.Result', oResponse.Result);
 	if (oResponse.Result)
 	{
 		this.historyItems([]);
