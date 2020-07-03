@@ -32,16 +32,14 @@ class CommandCreator extends \Aurora\System\Db\AbstractCommandCreator
 	 */
 	public function getList($UserId, $ResourceType, $ResourceId, $Offset = 0, $Limit = 0)
 	{
-		$Limit = "";
-		$Offset = "";
+		$sLimit = "";
 		if ($Limit > 0)
 		{
-			$Limit = sprintf("LIMIT %d", $Limit);
-			$Offset = sprintf("OFFSET %d", $Offset);
+			$sLimit = sprintf("LIMIT %d, %d", $Offset, $Limit);
 		}
-		$sSql = 'SELECT * FROM %sactivity_history WHERE user_id = %d AND resource_type = %s AND resource_id = %s %s %s';
+		$sSql = 'SELECT * FROM %sactivity_history WHERE user_id = %d AND resource_type = %s AND resource_id = %s %s';
 
-		return sprintf($sSql, $this->prefix(), $UserId, $this->escapeString($ResourceType), $this->escapeString($ResourceId), $Limit, $Offset);
+		return sprintf($sSql, $this->prefix(), $UserId, $this->escapeString($ResourceType), $this->escapeString($ResourceId), $sLimit);
 	}
 
 	/**
@@ -70,7 +68,7 @@ class CommandCreator extends \Aurora\System\Db\AbstractCommandCreator
 	 */
 	public function delete($UserId, $ResourceType, $ResourceId)
 	{
-		$sSql = 'DELETE FROM %smin_hashes WHERE user_id = %d, resource_type = %s, resource_id = %s';
+		$sSql = 'DELETE FROM %sactivity_history WHERE user_id = %d AND resource_type = %s AND resource_id = %s';
 
 		return sprintf($sSql, $this->prefix(), $UserId, $this->escapeString($ResourceType), $this->escapeString($ResourceId));
 	}
