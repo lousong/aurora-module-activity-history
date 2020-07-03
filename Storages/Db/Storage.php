@@ -64,6 +64,24 @@ class Storage extends \Aurora\Modules\ActivityHistory\Storages\Storage
 		return $mResult;
 	}
 
+	public function getListCount($UserId, $ResourceType, $ResourceId)
+	{
+		$iResult = 0;
+
+		if ($this->oConnection->Execute($this->oCommandCreator->getListCount($UserId, $ResourceType, $ResourceId)))
+		{
+			$oRow = $this->oConnection->GetNextRecord();
+			if ($oRow && isset($oRow->cnt))
+			{
+				$iResult = (int) $oRow->cnt;
+			}
+		}
+		$this->oConnection->FreeResult();
+
+		$this->throwDbExceptionIfExist();
+		return $iResult;
+	}
+
 	public function delete($UserId, $ResourceType, $ResourceId)
 	{
 		$mResult = $this->oConnection->Execute($this->oCommandCreator->delete($UserId, $ResourceType, $ResourceId));

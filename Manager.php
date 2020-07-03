@@ -58,6 +58,24 @@ class Manager extends \Aurora\System\Managers\AbstractManagerWithStorage
 		return $mResult;
 	}
 
+	/**
+	 * @param string $sHashID
+	 *
+	 * @return array|bool
+	 */
+	public function GetListCount($UserId, $ResourceType, $ResourceId)
+	{
+		$mResult = false;
+		try
+		{
+			$mResult = $this->oStorage->getListCount($UserId, $ResourceType, $ResourceId);
+		}
+		catch (\Aurora\System\Exceptions\BaseException $oException)
+		{
+			$this->setLastException($oException);
+		}
+		return $mResult;
+	}
 
 	public function Delete($UserId, $ResourceType, $ResourceId)
 	{
