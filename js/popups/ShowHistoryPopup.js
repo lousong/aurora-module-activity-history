@@ -8,8 +8,9 @@ var
 	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 
 	Ajax = require('%PathToCoreWebclientModule%/js/Ajax.js'),
-	App = require('%PathToCoreWebclientModule%/js/App.js'),
+	Api = require('%PathToCoreWebclientModule%/js/Api.js'),
 	CAbstractPopup = require('%PathToCoreWebclientModule%/js/popups/CAbstractPopup.js'),
+	CDateModel = require('%PathToCoreWebclientModule%/js/models/CDateModel.js'),
 	CPageSwitcherView = require('%PathToCoreWebclientModule%/js/views/CPageSwitcherView.js'),
 	Screens = require('%PathToCoreWebclientModule%/js/Screens.js'),
 
@@ -63,7 +64,6 @@ CShowHistoryPopup.prototype.requestEvents = function ()
 	Ajax.send('ActivityHistory',
 		'GetList',
 		{
-			'UserId': App.getUserId(),
 			'ResourceType': 'file',
 			'ResourceId': this.item.path() + '/' + this.item.fileName(),
 			'Offset': (this.oPageSwitcher.currentPage() - 1) * this.iEventsPerPage,
@@ -76,30 +76,26 @@ CShowHistoryPopup.prototype.requestEvents = function ()
 
 CShowHistoryPopup.prototype.onGetActivityHistory = function (oResponse, oRequest)
 {
-	console.log('oResponse.Result', oResponse.Result);
-	oResponse.Result = {
-		Items: [
-			{time: moment().add(-1, 'hours').unix(), ip: '178.155.4.168', userPublicId: 'nadine@afterlogic.com'},
-			{time: moment().add(-3, 'hours').unix(), ip: '178.155.4.168', userPublicId: 'nadine@afterlogic.com'},
-			{time: moment().add(-4, 'hours').unix(), ip: '178.155.4.123', userPublicId: ''},
-			{time: moment().add(-5, 'hours').unix(), ip: '178.155.4.168', userPublicId: 'nadine@afterlogic.com'},
-			{time: moment().add(-1, 'days').unix(), ip: '178.155.4.156', userPublicId: ''},
-			{time: moment().add(-2, 'days').unix(), ip: '178.155.4.168', userPublicId: 'nadine@afterlogic.com'},
-		],
-		Count: 27
-	};
-	// oResponse.Result = {
-	// 	Items: [],
-	// 	Count: 0
-	// };
-	if (oResponse.Result)
+	if (oResponse.Result && _.isArray(oResponse.Result.Items))
 	{
-		this.historyItems(oResponse.Result.Items);
+		var aEvents = [];
+		_.each(oResponse.Result.Items, function (oItem) {
+			//ResourceId, ResourceType, UserId
+			var oDateModel = new CDateModel();
+			oDateModel.parse(oItem.Timestamp);
+			aEvents.push({
+				time: oDateModel.getFullDate(),
+				action: oItem.Action,
+				userPublicId: oItem.GuestPublicId,
+				ip: oItem.IpAddress,
+			});
+		});
+		this.historyItems(aEvents);
 		this.oPageSwitcher.setCount(oResponse.Result.Count);
 	}
 	else
 	{
-		Screens.showError(TextUtils.i18n('%MODULENAME%/ERROR_GET_HISTORY'));
+		Api.showErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_GET_HISTORY'));
 	}
 	this.isLoading(false);
 };
@@ -117,20 +113,19 @@ CShowHistoryPopup.prototype.confirmClearHistory = function ()
 CShowHistoryPopup.prototype.clearHistory = function ()
 {
 	Ajax.send('ActivityHistory',
-		'ClearActivityHistory',
+		'Delete',
 		{
-			'Type': this.item.storageType(),
-			'Path': this.item.path(),
-			'Name': this.item.fileName(),
+			'ResourceType': 'file',
+			'ResourceId': this.item.path() + '/' + this.item.fileName(),
 		},
-		this.onClearActivityHistory,
+		this.onDeleteActivityHistory,
 		this
 	);
 };
 
-CShowHistoryPopup.prototype.onClearActivityHistory = function (oResponse, oRequest)
+CShowHistoryPopup.prototype.onDeleteActivityHistory = function (oResponse, oRequest)
 {
-	oResponse.Result = true;
+	console.log('oResponse.Result', oResponse.Result);
 	if (oResponse.Result)
 	{
 		this.historyItems([]);
@@ -139,7 +134,7 @@ CShowHistoryPopup.prototype.onClearActivityHistory = function (oResponse, oReque
 	}
 	else
 	{
-		Screens.showError(TextUtils.i18n('%MODULENAME%/ERROR_CLEAR_HISTORY'));
+		Api.showErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_CLEAR_HISTORY'));
 	}
 	this.isLoading(false);
 };
