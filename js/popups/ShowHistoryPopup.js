@@ -65,7 +65,7 @@ CShowHistoryPopup.prototype.requestEvents = function ()
 		'GetList',
 		{
 			'ResourceType': 'file',
-			'ResourceId': this.item.path() + '/' + this.item.fileName(),
+			'ResourceId': this.item.storageType() + this.item.fullPath(),
 			'Offset': (this.oPageSwitcher.currentPage() - 1) * this.iEventsPerPage,
 			'Limit': this.iEventsPerPage
 		},
@@ -80,7 +80,6 @@ CShowHistoryPopup.prototype.onGetActivityHistory = function (oResponse, oRequest
 	{
 		var aEvents = [];
 		_.each(oResponse.Result.Items, function (oItem) {
-			//ResourceId, ResourceType, UserId
 			var oDateModel = new CDateModel();
 			oDateModel.parse(oItem.Timestamp);
 			aEvents.push({
@@ -116,7 +115,7 @@ CShowHistoryPopup.prototype.clearHistory = function ()
 		'Delete',
 		{
 			'ResourceType': 'file',
-			'ResourceId': this.item.path() + '/' + this.item.fileName(),
+			'ResourceId': this.item.storageType() + this.item.fullPath(),
 		},
 		this.onDeleteActivityHistory,
 		this
