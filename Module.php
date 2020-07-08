@@ -31,6 +31,9 @@ class Module extends \Aurora\System\Module\AbstractModule
 		$this->oManager = new Manager($this);
 		$this->subscribeEvent('Core::CreateTables::after', array($this, 'onAfterCreateTables'));
 		$this->subscribeEvent('AddToActivityHistory', array($this, 'onAddToActivityHistory'));
+		$this->subscribeEvent('Files::Delete::after', array($this, 'onAfterFilesDelete'));
+		$this->subscribeEvent('Files::DeletePublicLink::after', array($this, 'onAfterFilesDeletePublicLink'));
+		$this->subscribeEvent('CreatePublicLink::after', array($this, 'onAfterFilesCreatePublicLink'));
 		$this->aDeniedMethodsByWebApi = [];
 	}
 
@@ -64,6 +67,37 @@ class Module extends \Aurora\System\Module\AbstractModule
 			}
 		}
 		$this->Create($iUserId, $aParams['ResourceType'], $aParams['ResourceId'], $aParams['Action']);
+	}
+
+	public function onAfterFilesDelete(&$aArgs, &$mResult)
+	{
+		$iUserId = $aArgs['UserId'];
+		$sStorage = $aArgs['Type'];
+		$aItems = $aArgs['Items'];
+
+		foreach ($aItems as $aItem)
+		{
+			$sResourceId = $sStorage . '/' . \ltrim(\ltrim($aItem['Path'], '/') . '/' . \ltrim($aItem['Name'], '/'), '/');
+			$this->Delete($iUserId, 'file', $sResourceId);
+		}
+	}
+
+	public function onAfterFilesCreatePublicLink(&$aArgs, &$mResult)
+	{
+		$iUserId = $aArgs['UserId'];
+		$sStorage = $aArgs['Type'];
+
+		$sResourceId = $sStorage . '/' . \ltrim(\ltrim($aArgs['Path'], '/') . '/' . \ltrim($aArgs['Name'], '/'), '/');
+		$this->Create($iUserId, 'file', $sResourceId, 'create-public-link');
+	}
+
+	public function onAfterFilesDeletePublicLink(&$aArgs, &$mResult)
+	{
+		$iUserId = $aArgs['UserId'];
+		$sStorage = $aArgs['Type'];
+
+		$sResourceId = $sStorage . '/' . \ltrim(\ltrim($aArgs['Path'], '/') . '/' . \ltrim($aArgs['Name'], '/'), '/');
+		$this->Delete($iUserId, 'file', $sResourceId);
 	}
 
 	protected function CheckAccess(&$UserId)
