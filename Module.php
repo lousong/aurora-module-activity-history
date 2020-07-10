@@ -66,7 +66,8 @@ class Module extends \Aurora\System\Module\AbstractModule
 				$iUserId = $oUser->EntityId;
 			}
 		}
-		$this->Create($iUserId, $aParams['ResourceType'], $aParams['ResourceId'], $aParams['Action']);
+		$sGuestPublicId = isset($aParams['GuestPublicId']) ? $aParams['GuestPublicId'] : null;
+		$this->Create($iUserId, $aParams['ResourceType'], $aParams['ResourceId'], $aParams['Action'], $sGuestPublicId);
 	}
 
 	public function onAfterFilesDelete(&$aArgs, &$mResult)
@@ -158,7 +159,7 @@ class Module extends \Aurora\System\Module\AbstractModule
 	/***** public functions might be called with web API *****/
 	/**
 	 */
-	public function Create($UserId, $ResourceType, $ResourceId, $Action)
+	public function Create($UserId, $ResourceType, $ResourceId, $Action, $GuestPublicId = null)
 	{
 		\Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::Anonymous);
 
@@ -176,11 +177,13 @@ class Module extends \Aurora\System\Module\AbstractModule
 			$IpAddress = $_SERVER['REMOTE_ADDR'];
 		}
 
-		$GuestPublicId = null;
-		$oUser = \Aurora\System\Api::getAuthenticatedUser();
-		if ($oUser)
+		if (!isset($GuestPublicId))
 		{
-			$GuestPublicId = $oUser->PublicId;
+			$oUser = \Aurora\System\Api::getAuthenticatedUser();
+			if ($oUser)
+			{
+				$GuestPublicId = $oUser->PublicId;
+			}
 		}
 		return $this->oManager->Create($UserId, $ResourceType, $ResourceId, $IpAddress, $Action, time(), $GuestPublicId);
 	}
