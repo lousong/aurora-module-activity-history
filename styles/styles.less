@@ -3,17 +3,16 @@
 	width: 620px;
 
 	.item {
-		.event_date {
-			width: 30%;
+		.event_date, .event_action, .event_ip, .event_user {
 			display: inline-block;
+			vertical-align: middle;
+			white-space: normal;
+		}
+		.event_date, .event_user {
+			width: 30%;
 		}
 		.event_action, .event_ip {
 			width: 20%;
-			display: inline-block;
-		}
-		.event_user {
-			width: 30%;
-			display: inline-block;
 		}
 		&.item_info {
 			text-align: center;
