@@ -34,6 +34,7 @@ class Module extends \Aurora\System\Module\AbstractModule
 		$this->subscribeEvent('Files::Delete::after', array($this, 'onAfterFilesDelete'));
 		$this->subscribeEvent('Files::DeletePublicLink::after', array($this, 'onAfterFilesDeletePublicLink'));
 		$this->subscribeEvent('CreatePublicLink::after', array($this, 'onAfterFilesCreatePublicLink'));
+		$this->subscribeEvent('OpenPgpFilesWebclient::ValidatePublicLinkPassword::after', array($this, 'onAfterValidatePublicLinkPassword'));
 		$this->aDeniedMethodsByWebApi = [];
 	}
 
@@ -90,6 +91,14 @@ class Module extends \Aurora\System\Module\AbstractModule
 
 		$sResourceId = $sStorage . '/' . \ltrim(\ltrim($aArgs['Path'], '/') . '/' . \ltrim($aArgs['Name'], '/'), '/');
 		$this->Create($iUserId, 'file', $sResourceId, 'create-public-link');
+	}
+	
+	public function onAfterValidatePublicLinkPassword(&$aArgs, &$mResult)
+	{
+		if (!$mResult)
+		{
+			$this->CreateFromHash($aArgs['Hash'], 'wrong-password');
+		}
 	}
 
 	public function onAfterFilesDeletePublicLink(&$aArgs, &$mResult)
@@ -186,6 +195,30 @@ class Module extends \Aurora\System\Module\AbstractModule
 			}
 		}
 		return $this->oManager->Create($UserId, $ResourceType, $ResourceId, $IpAddress, $Action, time(), $GuestPublicId);
+	}
+
+	public function CreateFromHash($Hash, $EventName)
+	{
+		$oMin = \Aurora\Modules\Min\Module::getInstance();
+		$mMin = $oMin->GetMinByHash($Hash);
+		if (isset($mMin['UserId']) && isset($mMin['Type']) && isset($mMin['Path']) && isset($mMin['Name']))
+		{
+			$mUserId = $mMin['UserId'];
+			if (is_string($mUserId))
+			{
+				$oUser = \Aurora\Modules\Core\Module::getInstance()->GetUserByPublicId($mUserId);
+				if ($oUser instanceof \Aurora\Modules\Core\Classes\User)
+				{
+					$mUserId = $oUser->EntityId;
+				}
+			}
+			if (is_int($mUserId))
+			{
+				$sStorage = $mMin['Type'];
+				$sResourceId = $sStorage . '/' . \ltrim(\ltrim($mMin['Path'], '/') . '/' . \ltrim($mMin['Name'], '/'), '/');
+				$this->Create($mUserId, 'file', $sResourceId, $EventName);
+			}
+		}
 	}
 
 	/**
