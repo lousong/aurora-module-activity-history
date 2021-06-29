@@ -29,27 +29,12 @@ class Module extends \Aurora\System\Module\AbstractModule
 	public function init()
 	{
 		$this->oManager = new Manager($this);
-		$this->subscribeEvent('Core::CreateTables::after', array($this, 'onAfterCreateTables'));
 		$this->subscribeEvent('AddToActivityHistory', array($this, 'onAddToActivityHistory'));
 		$this->subscribeEvent('Files::Delete::after', array($this, 'onAfterFilesDelete'));
 		$this->subscribeEvent('Files::DeletePublicLink::after', array($this, 'onAfterFilesDeletePublicLink'));
 		$this->subscribeEvent('CreatePublicLink::after', array($this, 'onAfterFilesCreatePublicLink'));
 		$this->subscribeEvent('OpenPgpFilesWebclient::ValidatePublicLinkPassword::after', array($this, 'onAfterValidatePublicLinkPassword'));
 		$this->aDeniedMethodsByWebApi = [];
-	}
-
-	/**
-	 * Creates tables required for module work. Called by event subscribe.
-	 *
-	 * @ignore
-	 * @param array $aParams Parameters
-	 */
-	public function onAfterCreateTables($aParams, &$mResult)
-	{
-		if ($mResult)
-		{
-			$mResult = $this->oManager->createTablesFromFile();
-		}
 	}
 
 	public function onAddToActivityHistory($aParams, &$mResult)
