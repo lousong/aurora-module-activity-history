@@ -64,7 +64,7 @@ class Module extends \Aurora\System\Module\AbstractModule
 			$oUser = \Aurora\Modules\Core\Module::getInstance()->GetUserByPublicId($aParams['UserId']);
 			if ($oUser)
 			{
-				$iUserId = $oUser->EntityId;
+				$iUserId = $oUser->Id;
 			}
 		}
 		$sGuestPublicId = isset($aParams['GuestPublicId']) ? $aParams['GuestPublicId'] : null;
@@ -92,7 +92,7 @@ class Module extends \Aurora\System\Module\AbstractModule
 		$sResourceId = $sStorage . '/' . \ltrim(\ltrim($aArgs['Path'], '/') . '/' . \ltrim($aArgs['Name'], '/'), '/');
 		$this->Create($iUserId, 'file', $sResourceId, 'create-public-link');
 	}
-	
+
 	public function onAfterValidatePublicLinkPassword(&$aArgs, &$mResult)
 	{
 		if (!$mResult)
@@ -118,13 +118,13 @@ class Module extends \Aurora\System\Module\AbstractModule
 
 		if ($UserId === null)
 		{
-			$iUserId = $oAuthenticatedUser->EntityId;
+			$iUserId = $oAuthenticatedUser->Id;
 		}
 		else
 		{
 			$iUserId = (int) $UserId;
 
-			$iUserRole = $oAuthenticatedUser instanceof \Aurora\Modules\Core\Classes\User ? $oAuthenticatedUser->Role : \Aurora\System\Enums\UserRole::Anonymous;
+			$iUserRole = $oAuthenticatedUser instanceof \Aurora\Modules\Core\Models\User ? $oAuthenticatedUser->Role : \Aurora\System\Enums\UserRole::Anonymous;
 			switch ($iUserRole)
 			{
 				case (\Aurora\System\Enums\UserRole::SuperAdmin):
@@ -135,7 +135,7 @@ class Module extends \Aurora\System\Module\AbstractModule
 				case (\Aurora\System\Enums\UserRole::TenantAdmin):
 					// everything is allowed for TenantAdmin
 					$oUser = \Aurora\Modules\Core\Module::getInstance()->GetUser($iUserId);
-					if ($oUser instanceof \Aurora\Modules\Core\Classes\User)
+					if ($oUser instanceof \Aurora\Modules\Core\Models\User)
 					{
 						if ($oAuthenticatedUser->IdTenant === $oUser->IdTenant)
 						{
@@ -146,7 +146,7 @@ class Module extends \Aurora\System\Module\AbstractModule
 					break;
 				case (\Aurora\System\Enums\UserRole::NormalUser):
 					// User identifier shoud be checked
-					if ($iUserId === $oAuthenticatedUser->EntityId)
+					if ($iUserId === $oAuthenticatedUser->Id)
 					{
 						$UserId = $iUserId;
 						$bAccessDenied = false;
@@ -207,9 +207,9 @@ class Module extends \Aurora\System\Module\AbstractModule
 			if (is_string($mUserId))
 			{
 				$oUser = \Aurora\Modules\Core\Module::getInstance()->GetUserByPublicId($mUserId);
-				if ($oUser instanceof \Aurora\Modules\Core\Classes\User)
+				if ($oUser instanceof \Aurora\Modules\Core\Models\User)
 				{
-					$mUserId = $oUser->EntityId;
+					$mUserId = $oUser->Id;
 				}
 			}
 			if (is_int($mUserId))
@@ -228,7 +228,7 @@ class Module extends \Aurora\System\Module\AbstractModule
 		\Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::NormalUser);
 		$this->CheckAccess($UserId);
 		return [
-			'Items' => $this->oManager->GetList($UserId, $ResourceType, $ResourceId, $Offset, $Limit),
+			'Items' => $this->oManager->GetList($UserId, $ResourceType, $ResourceId, $Offset, $Limit)->toArray(),
 			'Count' => $this->oManager->GetListCount($UserId, $ResourceType, $ResourceId)
 		];
 	}
