@@ -7,16 +7,18 @@
 
 namespace Aurora\Modules\ActivityHistory;
 
+use Aurora\Modules\ActivityHistory\Models\ActivityHistory;
+
 /**
  * @license https://www.gnu.org/licenses/agpl-3.0.html AGPL-3.0
  * @license https://afterlogic.com/products/common-licensing Afterlogic Software License
  * @copyright Copyright (c) 2019, Afterlogic Corp.
  */
-class Manager extends \Aurora\System\Managers\AbstractManagerWithStorage
+class Manager extends \Aurora\System\Managers\AbstractManager
 {
 	public function __construct(\Aurora\System\Module\AbstractModule $oModule = null)
 	{
-		parent::__construct($oModule, new Storages\Db\Storage($this));
+		parent::__construct($oModule);
 	}
 
 	/**
@@ -27,16 +29,15 @@ class Manager extends \Aurora\System\Managers\AbstractManagerWithStorage
 	 */
 	public function Create($UserId, $ResourceType, $ResourceId, $IpAddress, $Action, $Time, $GuestPublicId)
 	{
-		$mResult = false;
-		try
-		{
-			$mResult = $this->oStorage->create($UserId, $ResourceType, $ResourceId, $IpAddress, $Action, $Time, $GuestPublicId);
-		}
-		catch (\Aurora\System\Exceptions\BaseException $oException)
-		{
-			$this->setLastException($oException);
-		}
-		return $mResult;
+		return ActivityHistory::create([
+			'UserId' => $UserId,
+			'ResourceType' => $ResourceType,
+			'ResourceId' => $ResourceId,
+			'IpAddress' => $IpAddress,
+			'Action' => $Action,
+			'Timestamp' => $Time,
+			'GuestPublicId' => $GuestPublicId
+		]);
 	}
 
 	/**
@@ -46,16 +47,18 @@ class Manager extends \Aurora\System\Managers\AbstractManagerWithStorage
 	 */
 	public function GetList($UserId, $ResourceType, $ResourceId, $Offset, $Limit)
 	{
-		$mResult = false;
-		try
-		{
-			$mResult = $this->oStorage->getList($UserId, $ResourceType, $ResourceId, $Offset, $Limit);
+		$oQuery = ActivityHistory::where([
+			['UserId', '=', $UserId],
+			['ResourceType', '=', $ResourceType],
+			['ResourceId', '=', $ResourceId],
+		]);
+		if ($Offset > 0) {
+			$oQuery = $oQuery->offset($Offset);
 		}
-		catch (\Aurora\System\Exceptions\BaseException $oException)
-		{
-			$this->setLastException($oException);
+		if ($Limit > 0) {
+			$oQuery = $oQuery->limit($Limit);
 		}
-		return $mResult;
+		return $oQuery->get();
 	}
 
 	/**
@@ -65,51 +68,19 @@ class Manager extends \Aurora\System\Managers\AbstractManagerWithStorage
 	 */
 	public function GetListCount($UserId, $ResourceType, $ResourceId)
 	{
-		$mResult = false;
-		try
-		{
-			$mResult = $this->oStorage->getListCount($UserId, $ResourceType, $ResourceId);
-		}
-		catch (\Aurora\System\Exceptions\BaseException $oException)
-		{
-			$this->setLastException($oException);
-		}
-		return $mResult;
+		return ActivityHistory::where([
+			['UserId', '=', $UserId],
+			['ResourceType', '=', $ResourceType],
+			['ResourceId', '=', $ResourceId],
+		])->count();
 	}
 
 	public function Delete($UserId, $ResourceType, $ResourceId)
 	{
-		$mResult = false;
-		try
-		{
-			$mResult = $this->oStorage->delete($UserId, $ResourceType, $ResourceId);
-		}
-		catch (\Aurora\System\Exceptions\BaseException $oException)
-		{
-			$this->setLastException($oException);
-		}
-		return $mResult;
-	}
-	
-	/**
-	 * Creates tables required for module work by executing create.sql file.
-	 * 
-	 * @return boolean
-	 */
-	public function createTablesFromFile()
-	{
-		$bResult = false;
-		
-		try
-		{
-			$sFilePath = dirname(__FILE__) . '/Storages/Db/sql/create.sql';
-			$bResult = \Aurora\System\Managers\Db::getInstance()->executeSqlFile($sFilePath);
-		}
-		catch (\Aurora\System\Exceptions\BaseException $oException)
-		{
-			$this->setLastException($oException);
-		}
-
-		return $bResult;
+		return ActivityHistory::where([
+			['UserId', '=', $UserId],
+			['ResourceType', '=', $ResourceType],
+			['ResourceId', '=', $ResourceId],
+		])->delete();
 	}
 }
