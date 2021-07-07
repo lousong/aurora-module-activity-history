@@ -40,6 +40,7 @@ class CreateActivityHistoryTable extends Migration
                 $table->timestamp(\Aurora\System\Classes\Model::CREATED_AT)->nullable();
                 $table->timestamp(\Aurora\System\Classes\Model::UPDATED_AT)->nullable();
             });
+        }
     }
 
     /**
