@@ -24,7 +24,8 @@ class CreateActivityHistoryTable extends Migration
                 $table->integer('Timestamp')->default(0);
                 $table->string('GuestPublicId')->default('');
 
-                $table->timestamps();
+                $table->timestamp(\Aurora\System\Classes\Model::CREATED_AT)->nullable();
+                $table->timestamp(\Aurora\System\Classes\Model::UPDATED_AT)->nullable();
             });
         } else if (Capsule::schema()->hasColumn('activity_history', 'user_id')) {
             Capsule::schema()->rename('id', 'Id');
@@ -35,7 +36,10 @@ class CreateActivityHistoryTable extends Migration
             Capsule::schema()->rename('action', 'Action');
             Capsule::schema()->rename('timestamp', 'Timestamp');
             Capsule::schema()->rename('guest_public_id', 'GuestPublicId');
-        }
+            Capsule::schema()->create('activity_history', function (Blueprint $table) {
+                $table->timestamp(\Aurora\System\Classes\Model::CREATED_AT)->nullable();
+                $table->timestamp(\Aurora\System\Classes\Model::UPDATED_AT)->nullable();
+            });
     }
 
     /**
