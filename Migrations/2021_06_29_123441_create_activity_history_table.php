@@ -28,15 +28,15 @@ class CreateActivityHistoryTable extends Migration
                 $table->timestamp(\Aurora\System\Classes\Model::UPDATED_AT)->nullable();
             });
         } else if (Capsule::schema()->hasColumn('activity_history', 'user_id')) {
-            Capsule::schema()->rename('id', 'Id');
-            Capsule::schema()->rename('user_id', 'UserId');
-            Capsule::schema()->rename('resource_type', 'ResourceType');
-            Capsule::schema()->rename('resource_id', 'ResourceId');
-            Capsule::schema()->rename('ip_address', 'IpAddress');
-            Capsule::schema()->rename('action', 'Action');
-            Capsule::schema()->rename('timestamp', 'Timestamp');
-            Capsule::schema()->rename('guest_public_id', 'GuestPublicId');
-            Capsule::schema()->create('activity_history', function (Blueprint $table) {
+            Capsule::schema()->table('activity_history', function (Blueprint $table) {
+                $table->renameColumn('id', 'Id');
+                $table->renameColumn('user_id', 'UserId');
+                $table->renameColumn('resource_type', 'ResourceType');
+                $table->renameColumn('resource_id', 'ResourceId');
+                $table->renameColumn('ip_address', 'IpAddress');
+                $table->renameColumn('action', 'Action');
+                $table->renameColumn('time', 'Timestamp');
+                $table->renameColumn('guest_public_id', 'GuestPublicId'); 
                 $table->timestamp(\Aurora\System\Classes\Model::CREATED_AT)->nullable();
                 $table->timestamp(\Aurora\System\Classes\Model::UPDATED_AT)->nullable();
             });
