@@ -24,6 +24,7 @@ class ActivityHistory extends \Aurora\System\Classes\Model
 	protected $table = 'activity_history';
 
 	protected $fillable = [
+		'Id',
 		'UserId',
 		'ResourceType',
 		'ResourceId',
