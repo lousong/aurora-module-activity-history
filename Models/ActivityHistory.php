@@ -21,7 +21,7 @@ namespace Aurora\Modules\ActivityHistory\Models;
  */
 class ActivityHistory extends \Aurora\System\Classes\Model
 {
-	protected $table = 'activity_history';
+	protected $table = 'core_activity_history';
 
 	protected $fillable = [
 		'Id',

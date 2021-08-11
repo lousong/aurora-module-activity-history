@@ -14,7 +14,7 @@ class CreateActivityHistoryTable extends Migration
     public function up()
     {
         if (!Capsule::schema()->hasTable('activity_history')) {
-            Capsule::schema()->create('activity_history', function (Blueprint $table) {
+            Capsule::schema()->create('core_activity_history', function (Blueprint $table) {
                 $table->id('Id');
                 $table->integer('UserId')->default(0);
                 $table->string('ResourceType')->default('');
@@ -27,8 +27,9 @@ class CreateActivityHistoryTable extends Migration
                 $table->timestamp(\Aurora\System\Classes\Model::CREATED_AT)->nullable();
                 $table->timestamp(\Aurora\System\Classes\Model::UPDATED_AT)->nullable();
             });
-        } else if (Capsule::schema()->hasColumn('activity_history', 'user_id')) {
-            Capsule::schema()->table('activity_history', function (Blueprint $table) {
+        } else {
+            Capsule::schema()->rename('activity_history', 'core_activity_history');
+            Capsule::schema()->table('core_activity_history', function (Blueprint $table) {
                 $table->renameColumn('id', 'Id');
                 $table->renameColumn('user_id', 'UserId');
                 $table->renameColumn('resource_type', 'ResourceType');
@@ -50,6 +51,6 @@ class CreateActivityHistoryTable extends Migration
      */
     public function down()
     {
-        Capsule::schema()->dropIfExists('activity_history');
+        Capsule::schema()->dropIfExists('core_activity_history');
     }
 }
