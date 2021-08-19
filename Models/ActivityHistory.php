@@ -23,6 +23,9 @@ class ActivityHistory extends \Aurora\System\Classes\Model
 {
 	protected $table = 'core_activity_history';
 
+	protected $foreignModel = 'Aurora\Modules\Core\Models\User';
+	protected $foreignModelIdColumn = 'UserId'; // Column that refers to an external table
+
 	protected $fillable = [
 		'Id',
 		'UserId',
