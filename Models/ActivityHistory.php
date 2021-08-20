@@ -6,6 +6,8 @@
 
 namespace Aurora\Modules\ActivityHistory\Models;
 
+use Aurora\Modules\Core\Models\User;
+
 /**
  * @license https://afterlogic.com/products/common-licensing Afterlogic Software License
  * @copyright Copyright (c) 2019, Afterlogic Corp.
@@ -23,7 +25,7 @@ class ActivityHistory extends \Aurora\System\Classes\Model
 {
 	protected $table = 'core_activity_history';
 
-	protected $foreignModel = 'Aurora\Modules\Core\Models\User';
+	protected $foreignModel = User::class;
 	protected $foreignModelIdColumn = 'UserId'; // Column that refers to an external table
 
 	protected $fillable = [
