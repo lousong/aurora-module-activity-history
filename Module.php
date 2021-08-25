@@ -34,6 +34,7 @@ class Module extends \Aurora\System\Module\AbstractModule
 		$this->subscribeEvent('Files::DeletePublicLink::after', array($this, 'onAfterFilesDeletePublicLink'));
 		$this->subscribeEvent('CreatePublicLink::after', array($this, 'onAfterFilesCreatePublicLink'));
 		$this->subscribeEvent('OpenPgpFilesWebclient::ValidatePublicLinkPassword::after', array($this, 'onAfterValidatePublicLinkPassword'));
+		$this->subscribeEvent('Core::DeleteUser::before', array($this, 'onBeforeDeleteUser'));
 		$this->aDeniedMethodsByWebApi = [];
 	}
 
@@ -93,6 +94,15 @@ class Module extends \Aurora\System\Module\AbstractModule
 
 		$sResourceId = $sStorage . '/' . \ltrim(\ltrim($aArgs['Path'], '/') . '/' . \ltrim($aArgs['Name'], '/'), '/');
 		$this->Delete($iUserId, 'file', $sResourceId);
+	}
+
+	public function onBeforeDeleteUser($aArgs, &$mResult)
+	{
+		$mResult = $this->oManager->GetListByUserId($aArgs["UserId"]);
+		foreach($mResult as $oItem)
+		{
+			$this->oManager->DeleteActivityHistory($oItem->Id);
+		}
 	}
 
 	protected function CheckAccess(&$UserId)

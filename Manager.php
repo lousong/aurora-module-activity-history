@@ -40,6 +40,32 @@ class Manager extends \Aurora\System\Managers\AbstractManager
 		]);
 	}
 
+		/**
+	 * @param string $sHashID
+	 *
+	 * @return array|bool
+	 */
+	public function GetListByUserId($UserId)
+	{
+		return ActivityHistory::where('UserId',$UserId)->get();
+	}
+
+	public function DeleteActivityHistory($iId)
+	{
+		$bResult = false;
+		
+		try
+		{
+			$bResult = !!ActivityHistory::find($iId)->delete();
+		}
+		catch (\Aurora\System\Exceptions\BaseException $oException)
+		{
+			$this->setLastException($oException);
+		}
+
+		return $bResult;
+	}
+
 	/**
 	 * @param string $sHashID
 	 *
