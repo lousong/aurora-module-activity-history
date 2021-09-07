@@ -188,6 +188,10 @@ class Module extends \Aurora\System\Module\AbstractModule
 			{
 				$GuestPublicId = $oUser->PublicId;
 			}
+			else
+			{
+				$GuestPublicId = '';
+			}
 		}
 		return $this->oManager->Create($UserId, $ResourceType, $ResourceId, $IpAddress, $Action, time(), $GuestPublicId);
 	}
