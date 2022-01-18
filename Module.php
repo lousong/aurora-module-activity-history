@@ -7,6 +7,8 @@
 
 namespace Aurora\Modules\ActivityHistory;
 
+use Aurora\Api;
+
 /**
  * System module provides hash-based object storage.
  *
@@ -104,60 +106,6 @@ class Module extends \Aurora\System\Module\AbstractModule
 			$this->oManager->DeleteActivityHistory($oItem->Id);
 		}
 	}
-
-	protected function CheckAccess(&$UserId)
-	{
-		$bAccessDenied = true;
-
-		$oAuthenticatedUser = \Aurora\System\Api::getAuthenticatedUser();
-
-		if ($UserId === null)
-		{
-			$iUserId = $oAuthenticatedUser->Id;
-		}
-		else
-		{
-			$iUserId = (int) $UserId;
-
-			$iUserRole = $oAuthenticatedUser instanceof \Aurora\Modules\Core\Models\User ? $oAuthenticatedUser->Role : \Aurora\System\Enums\UserRole::Anonymous;
-			switch ($iUserRole)
-			{
-				case (\Aurora\System\Enums\UserRole::SuperAdmin):
-					// everything is allowed for SuperAdmin
-					$UserId = $iUserId;
-					$bAccessDenied = false;
-					break;
-				case (\Aurora\System\Enums\UserRole::TenantAdmin):
-					// everything is allowed for TenantAdmin
-					$oUser = \Aurora\Modules\Core\Module::getInstance()->GetUser($iUserId);
-					if ($oUser instanceof \Aurora\Modules\Core\Models\User)
-					{
-						if ($oAuthenticatedUser->IdTenant === $oUser->IdTenant)
-						{
-							$UserId = $iUserId;
-							$bAccessDenied = false;
-						}
-					}
-					break;
-				case (\Aurora\System\Enums\UserRole::NormalUser):
-					// User identifier shoud be checked
-					if ($iUserId === $oAuthenticatedUser->Id)
-					{
-						$UserId = $iUserId;
-						$bAccessDenied = false;
-					}
-					break;
-				case (\Aurora\System\Enums\UserRole::Customer):
-				case (\Aurora\System\Enums\UserRole::Anonymous):
-					// everything is forbidden for Customer and Anonymous users
-					break;
-			}
-			if ($bAccessDenied)
-			{
-				throw new \Aurora\System\Exceptions\ApiException(\Aurora\System\Notifications::AccessDenied);
-			}
-		}
-	}
 	/***** private functions *****/
 
 	/***** public functions might be called with web API *****/
@@ -225,7 +173,7 @@ class Module extends \Aurora\System\Module\AbstractModule
 	public function GetList($UserId, $ResourceType, $ResourceId, $Offset = 0, $Limit = 0)
 	{
 		\Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::NormalUser);
-		$this->CheckAccess($UserId);
+		Api::CheckAccess($UserId);
 		return [
 			'Items' => $this->oManager->GetList($UserId, $ResourceType, $ResourceId, $Offset, $Limit)->toArray(),
 			'Count' => $this->oManager->GetListCount($UserId, $ResourceType, $ResourceId)
@@ -237,7 +185,7 @@ class Module extends \Aurora\System\Module\AbstractModule
     public function Delete($UserId, $ResourceType, $ResourceId)
     {
         \Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::NormalUser);
-		$this->CheckAccess($UserId);
+		Api::CheckAccess($UserId);
         return $this->oManager->Delete($UserId, $ResourceType, $ResourceId);
     }
 	/***** public functions might be called with web API *****/
