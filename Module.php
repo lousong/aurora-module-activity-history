@@ -8,6 +8,7 @@
 namespace Aurora\Modules\ActivityHistory;
 
 use Aurora\Api;
+use Aurora\Modules\ActivityHistory\Models\ActivityHistory;
 
 /**
  * System module provides hash-based object storage.
@@ -100,11 +101,7 @@ class Module extends \Aurora\System\Module\AbstractModule
 
 	public function onBeforeDeleteUser($aArgs, &$mResult)
 	{
-		$mResult = $this->oManager->GetListByUserId($aArgs["UserId"]);
-		foreach($mResult as $oItem)
-		{
-			$this->oManager->DeleteActivityHistory($oItem->Id);
-		}
+		ActivityHistory::where('UserId', $aArgs['UserId'])->delete();
 	}
 	/***** private functions *****/
 
