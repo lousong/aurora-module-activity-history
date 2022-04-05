@@ -25,6 +25,6 @@ class AlterActivityHistoryTable extends Migration
     public function down()
     {
         $prefix = Capsule::connection()->getTablePrefix();
-        Capsule::statement("ALTER TABLE {$prefix}core_activity_history ALTER COLUMN GuestPublicId varchar(255)");
+        Capsule::statement("ALTER TABLE {$prefix}core_activity_history MODIFY GuestPublicId varchar(255)");
     }
 }
