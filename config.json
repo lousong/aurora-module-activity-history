@@ -1,10 +1,22 @@
 {
-    "Disabled": [
-		false,
-		"bool"
-	],
-    "AvailableFor": [
-		["OpenPgpWebclient", "OpenPgpFilesWebclient", "FilesWebclient"],
-		"array"
-	]
+  "Disabled": [
+    false,
+    "bool"
+  ],
+  "Disabled_Description": [
+    "",
+    "string"
+  ],
+  "AvailableFor": [
+    [
+      "OpenPgpWebclient",
+      "OpenPgpFilesWebclient",
+      "FilesWebclient"
+    ],
+    "array"
+  ],
+  "AvailableFor_Description": [
+    "",
+    "string"
+  ]
 }
